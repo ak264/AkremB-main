@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import ModernProjectList from '../../components/ModernProjectList.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import { filterDraftContent } from '../../utils';
+
+const allProjects = await getCollection('projects');
+
+// Filter out drafts in production
+const allPublishedProjects = filterDraftContent(allProjects);
+
+// Extract all unique tags across projects
+const allTags = [...new Set(allProjects.flatMap(project => project.data.tags || []))].sort();
+
+// Get query parameters
+const activeTag = Astro.url.searchParams.get('tag');
+const activeStatus = Astro.url.searchParams.get('status');
+const searchQuery = Astro.url.searchParams.get('search');
+
+// Filter projects based on active filters
+let filteredProjects = allPublishedProjects;
+
+if (activeTag) {
+  filteredProjects = filteredProjects.filter(project => project.data.tags?.includes(activeTag));
+}
+
+if (activeStatus) {
+  filteredProjects = filteredProjects.filter(project => project.data.status === activeStatus);
+}
+
+if (searchQuery) {
+  const query = searchQuery.toLowerCase();
+  filteredProjects = filteredProjects.filter(project => 
+    project.data.title.toLowerCase().includes(query) || 
+    project.data.description.toLowerCase().includes(query)
+  );
+}
+
+// Sort by date
+const sortedProjects = filteredProjects.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title={activeTag ? `Projects tagged with "${activeTag}"` : "Projects"}
+  description="My portfolio of projects in web development, design, and more."
+>
+  <div class="container mx-auto px-4 py-8 project-grid">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">
+        {activeTag || activeStatus || searchQuery ? 'Filtered Projects' : 'My Projects'}
+      </h1>
+    </div>
+    
+    <FilterBar 
+      tags={allTags} 
+      projects={allProjects} 
+      baseUrl="/project/" 
+    />
+    
+    <div class="projects-grid">
+      <ModernProjectList projects={sortedProjects} />
+    </div>
+    
+    <div id="no-results" class="text-center py-12 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-sm" style="display: none;">
+      <div class="text-4xl mb-4">😕</div>
+      <p class="text-lg text-gray-700 dark:text-gray-300 mb-3">
+        No projects found matching your filters.
+      </p>
+      <a href="/project" class="inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+        Clear all filters
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Use styling that works with theme system */
+  .project-grid {
+    @apply bg-white dark:bg-zinc-900;
+  }
+  
+  :global(.dark) .project-grid {
+    @apply bg-zinc-900;
+  }
+  
+  :global(body) {
+    @apply bg-white text-gray-900;
+  }
+  
+  :global(body.dark) {
+    @apply bg-zinc-900 text-white;
+  }
+</style>

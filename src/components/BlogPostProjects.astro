@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+
+export interface Props {
+  postSlug: string;
+}
+
+const { postSlug } = Astro.props;
+
+// Get all projects
+const allProjects = await getCollection('projects');
+
+// Find projects that list this blog post in their relatedPosts
+const relatedProjects = allProjects.filter(project => 
+  project.data.relatedPosts?.includes(postSlug)
+);
+
+// Status color mapping
+const statusColors = {
+  'completed': 'bg-green-600 dark:bg-green-500',
+  'in-progress': 'bg-blue-600 dark:bg-blue-500',
+  'planned': 'bg-amber-600 dark:bg-amber-500'
+};
+
+// Status labels
+const statusLabels = {
+  'completed': 'Completed',
+  'in-progress': 'In Progress',
+  'planned': 'Planned'
+};
+---
+
+{relatedProjects.length > 0 && (
+  <div class="mt-8 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <h2 class="text-xl font-bold mb-4">Related Projects</h2>
+    
+    <div class="space-y-4">
+      {relatedProjects.map(project => (
+        <div class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-semibold">
+              <a href={`/project/${project.slug}`} class="hover:text-blue-600 dark:hover:text-blue-400">
+                {project.data.title}
+              </a>
+            </h3>
+            <span class={`text-xs px-2 py-0.5 rounded-full text-white ${statusColors[project.data.status || 'completed']}`}>
+              {statusLabels[project.data.status || 'completed']}
+            </span>
+          </div>
+          
+          <p class="text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+            {project.data.description}
+          </p>
+          
+          <div class="flex flex-wrap gap-2 mb-3">
+            {project.data.tags && project.data.tags.slice(0, 3).map(tag => (
+              <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                {tag}
+              </span>
+            ))}
+          </div>
+          
+          <div class="flex gap-3">
+            <a href={`/project/${project.slug}`} class="text-blue-600 dark:text-blue-400 text-sm font-medium">
+              View Details
+            </a>
+            
+            {project.data.demoLink && (
+              <a href={project.data.demoLink} class="text-gray-600 dark:text-gray-400 text-sm" target="_blank" rel="noopener noreferrer">
+                Live Demo →
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}

@@ -1,0 +1,128 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostHero from '../../components/PostHero.astro';
+import Badge from '../../components/Badge.astro';
+import PostItem from '../../components/PostItem.astro';
+import { formatDate, filterDraftContent } from '../../utils';
+
+export async function getStaticPaths() {
+  const allProjects = await getCollection('projects');
+  // Filter out drafts in production
+  const publishedProjects = filterDraftContent(allProjects);
+  
+  return publishedProjects.map((project) => ({
+    params: { slug: project.slug },
+    props: project,
+  }));
+}
+
+type Props = CollectionEntry<'projects'>;
+
+const project = Astro.props;
+const { Content } = await project.render();
+
+// Get related blog posts if any
+const allBlogPosts = await getCollection('blog');
+// Filter out draft blog posts
+const publishedBlogPosts = filterDraftContent(allBlogPosts);
+
+// Find posts that are explicitly linked via relatedPosts
+const relatedPosts = project.data.relatedPosts 
+  ? publishedBlogPosts.filter(post => project.data.relatedPosts?.includes(post.slug))
+  : [];
+
+// Sort by date (newest first)
+relatedPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Status color mapping
+const statusColors = {
+  'completed': 'bg-green-600 dark:bg-green-500',
+  'in-progress': 'bg-blue-600 dark:bg-blue-500',
+  'planned': 'bg-amber-600 dark:bg-amber-500'
+};
+
+// Status labels
+const statusLabels = {
+  'completed': 'Completed',
+  'in-progress': 'In Progress',
+  'planned': 'Planned'
+};
+---
+
+<BaseLayout title={project.data.title} description={project.data.description}>
+  <div class="container project-detail">
+    <div class="mx-auto max-w-3xl">
+      <PostHero content={project} />
+      
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-wrap gap-2">
+          {project.data.tags && project.data.tags.map(tag => (
+            <span class="text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-zinc-300">
+              {tag}
+            </span>
+          ))}
+        </div>
+        
+        <span class={`text-xs px-3 py-1 rounded-full text-white font-medium ${statusColors[project.data.status || 'completed']}`}>
+          {statusLabels[project.data.status || 'completed']}
+        </span>
+      </div>
+      
+      <div class="flex gap-4 mb-8">
+        {project.data.demoLink && (
+          <a href={project.data.demoLink} class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md" target="_blank" rel="noopener noreferrer">
+            Live Demo
+          </a>
+        )}
+        {project.data.githubLink && (
+          <a href={project.data.githubLink} class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md" target="_blank" rel="noopener noreferrer">
+            GitHub Repository
+          </a>
+        )}
+      </div>
+      
+      <div class="prose dark:prose-invert max-w-none">
+        <Content />
+      </div>
+      
+      <div class="mt-12">
+        <div class="flex justify-between gap-2 border-b mb-1 dark:border-b-zinc-700">
+          <h2 class="text-lg font-bold mb-3">Related Blog Posts</h2>
+          <a href="/posts/" class="inline-block py-2 underline dark:prose-invert">All posts &raquo;</a>
+        </div>
+        
+        {relatedPosts.length > 0 ? (
+          <div>
+            {relatedPosts.map(post => (
+              <PostItem post={post} />
+            ))}
+          </div>
+        ) : (
+          <p class="text-gray-500 dark:text-gray-400 italic py-4">
+            No related blog posts found. To associate blog posts with this project, add the blog post's slug to this project's "relatedPosts" frontmatter array.
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Style the prose content for dark mode */
+  :global(.dark) .prose {
+    color: #e0e0e0;
+  }
+  
+  :global(.dark) .prose h2 {
+    color: #ffffff;
+  }
+  
+  :global(.dark) .prose p, :global(.dark) .prose li {
+    color: #c0c0c0;
+  }
+  
+  .project-detail {
+    @apply bg-white dark:bg-zinc-900 text-gray-900 dark:text-white;
+  }
+</style>

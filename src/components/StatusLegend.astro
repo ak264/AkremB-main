@@ -1,0 +1,52 @@
+---
+import { projectStatuses, statusCategories } from '../config/projectStatus';
+
+// Group statuses by category
+const groupedStatuses = Object.values(statusCategories).map(category => {
+  const statuses = projectStatuses.filter(status => status.category === category.id);
+  return {
+    category,
+    statuses
+  };
+});
+
+interface Props {
+  showTitle?: boolean;
+  className?: string;
+}
+
+const { showTitle = true, className = '' } = Astro.props;
+---
+
+<div class={`status-legend ${className}`}>
+  {showTitle && <h3 class="text-lg font-semibold mb-3">Project Status Legend</h3>}
+  
+  <div class="space-y-4">
+    {groupedStatuses.map(group => (
+      <div class="category-group">
+        <div class="category-header flex items-center mb-2">
+          <span 
+            class="w-3 h-3 rounded-full mr-2" 
+            style={`background-color: ${group.category.color};`}
+          ></span>
+          <span class="text-md font-medium">{group.category.emoji} {group.category.label}</span>
+        </div>
+        
+        <div class="pl-5 space-y-1">
+          {group.statuses.map(status => (
+            <div class="status-item flex items-center">
+              <span class="text-sm">{status.emoji} {status.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* Dark mode styles */
+  :global(.dark) .category-header span:first-child[style*="background-color"] {
+    filter: brightness(1.1);
+  }
+</style>

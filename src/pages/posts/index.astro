@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostsByYear from '../../components/PostsByYear.astro';
+import FilterBar from '../../components/FilterBar.astro';
+
+type BlogPost = CollectionEntry<'blog'>;
+
+// Get all blog posts
+const allPosts = await getCollection('blog');
+
+// Extract all unique tags across posts
+const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))].sort();
+
+// Get query parameters
+const activeTag = Astro.url.searchParams.get('tag');
+const searchQuery = Astro.url.searchParams.get('search');
+
+// Filter posts based on active filters
+let filteredPosts = allPosts;
+
+if (activeTag) {
+  filteredPosts = filteredPosts.filter(post => post.data.tags?.includes(activeTag));
+}
+
+if (searchQuery) {
+  const query = searchQuery.toLowerCase();
+  filteredPosts = filteredPosts.filter(post => 
+    post.data.title.toLowerCase().includes(query) || 
+    post.data.description?.toLowerCase().includes(query)
+  );
+}
+
+// Sort by date
+const sortedPosts = filteredPosts.sort((a: BlogPost, b: BlogPost) => 
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+// Create page title based on active filters
+let title = 'All posts';
+if (activeTag) title = `Posts tagged with "${activeTag}"`;
+if (searchQuery) title = `Search: "${searchQuery}"`;
+if (activeTag && searchQuery) title = `Posts tagged "${activeTag}" containing "${searchQuery}"`;
+
+const description = 'Articles, guides, tutorials about front-end development.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+>
+  <div class='container'>
+    <div class="mb-6">
+      <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold">
+          {activeTag || (typeof searchQuery === 'string' && searchQuery.length > 0) ? 'Filtered Posts' : "All Posts"}
+        </h1>
+      </div>
+      <p class="text-zinc-700 dark:text-zinc-300 text-lg">{description}</p>
+    </div>
+    
+    <FilterBar 
+      tags={allTags} 
+      projects={allPosts} 
+      baseUrl="/posts/" 
+      showStatusFilter={false}
+    />
+    
+    <div class="posts-grid">
+      <PostsByYear posts={sortedPosts}/>
+    </div>
+    
+    <div id="no-results" class="text-center py-12 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-sm" style={filteredPosts.length > 0 ? "display: none;" : ""}>
+      <div class="text-4xl mb-4">😕</div>
+      <p class="text-lg text-gray-700 dark:text-gray-300 mb-3">
+        No posts found matching your filters.
+      </p>
+      <a href="/posts" class="inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+        Clear all filters
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Check if there are no posts to show the no-results message
+  document.addEventListener('DOMContentLoaded', () => {
+    const postsGrid = document.querySelector('.posts-grid');
+    const noResults = document.getElementById('no-results');
+    
+    if (postsGrid && noResults) {
+      const postItems = postsGrid.querySelectorAll('.post-card:not([style*="display: none"])');
+      if (postItems.length === 0) {
+        postsGrid.style.display = 'none';
+        noResults.style.display = '';
+      }
+    }
+  });
+</script>

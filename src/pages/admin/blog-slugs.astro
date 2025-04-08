@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatDate } from '../../utils';
+
+// Get all blog posts
+const allBlogPosts = await getCollection('blog');
+const sortedPosts = allBlogPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title="Blog Post Slugs"
+  description="A reference list of all blog post slugs for project association"
+>
+  <div class="container mx-auto py-8">
+    <div class="mx-auto max-w-3xl">
+      <h1 class="text-3xl font-bold mb-6">Blog Post Slugs Reference</h1>
+      <p class="mb-8 text-gray-600 dark:text-gray-300">
+        Use this page to find the correct slug for any blog post when you want to associate it with a project.
+        Copy the slug and add it to the <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">relatedPosts</code> array
+        in your project's frontmatter.
+      </p>
+
+      <div class="bg-gray-50 dark:bg-gray-800 p-4 mb-8 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-2">Example Usage:</h2>
+        <pre class="bg-gray-100 dark:bg-gray-900 p-4 rounded overflow-x-auto">
+---
+title: 'Your Project Title'
+description: 'Project description'
+pubDate: '2025-04-04'
+tags: ["Tag1", "Tag2"]
+demoLink: 'https://example.com'
+relatedPosts: ['first-post', 'second-post']
+---
+        </pre>
+      </div>
+
+      <div class="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Title
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Date
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Slug
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+            {sortedPosts.map((post) => (
+              <tr>
+                <td class="px-6 py-4 whitespace-normal">
+                  <a href={`/${post.slug}`} class="text-blue-600 dark:text-blue-400 hover:underline">{post.data.title}</a>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  {formatDate(post.data.pubDate)}
+                </td>
+                <td class="px-6 py-4">
+                  <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{post.slug}</code>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

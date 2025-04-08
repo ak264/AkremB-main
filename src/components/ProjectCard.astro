@@ -1,0 +1,84 @@
+---
+import { formatDate } from '../utils';
+import type { CollectionEntry } from 'astro:content';
+import Badge from './Badge.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, description, pubDate, tags, coverImage, demoLink, status = 'completed' } = project.data;
+
+// Status color mapping
+const statusColors = {
+  'completed': 'bg-green-600 dark:bg-green-500',
+  'in-progress': 'bg-blue-600 dark:bg-blue-500',
+  'planned': 'bg-amber-600 dark:bg-amber-500'
+};
+
+// Status labels
+const statusLabels = {
+  'completed': 'Completed',
+  'in-progress': 'In Progress',
+  'planned': 'Planned'
+};
+---
+
+<div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all hover:shadow-md">
+  {coverImage && (
+    <a href={`/project/${project.slug}`}>
+      <img 
+        src={coverImage.src} 
+        alt={`Cover image for ${title}`} 
+        class="w-full h-48 object-cover"
+      />
+    </a>
+  )}
+  
+  <div class="p-6">
+    <div class="flex justify-between mb-4">
+      <h2 class="text-xl font-bold">
+        <a href={`/project/${project.slug}`} class="hover:text-blue-600 dark:hover:text-blue-400">
+          {title}
+        </a>
+      </h2>
+      
+      <span class={`text-xs px-2 py-0.5 rounded text-white font-medium ${statusColors[status]}`}>
+        {statusLabels[status]}
+      </span>
+    </div>
+    
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+      {formatDate(pubDate)}
+    </p>
+    
+    <p class="mb-4 line-clamp-3">{description}</p>
+    
+    {tags && tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-4">
+        {tags.map(tag => <Badge>{tag}</Badge>)}
+      </div>
+    )}
+    
+    <div class="flex justify-between mt-auto">
+      <a 
+        href={`/project/${project.slug}`} 
+        class="text-blue-600 dark:text-blue-400 font-medium hover:underline"
+      >
+        View Details
+      </a>
+      
+      {demoLink && (
+        <a 
+          href={demoLink} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gray-600 dark:text-gray-300 font-medium hover:underline"
+        >
+          Live Demo →
+        </a>
+      )}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Ava from '@src/assets/img/ava.jpg';
+import Prose from '../components/Prose.astro';
+
+---
+
+<BaseLayout
+	title="About Me"
+	description="About Akrem Berhanu - Builder, Thinker, Consultant"
+>
+  <div class='container'>
+		<main class='prose text-lg dark:prose-invert'>
+      <article>
+        <div class='w-full md:flex md:items-center gap-16 mb-10'>
+          <div class="text-pretty leading-9">
+            <h1 class="text-4xl font-bold mb-4">Hi There 👋, Akrem Here! </h1>
+            <Prose>
+              <div class="text-lg">
+                <p>I am a builder, thinker, and consultant from Houston, TX. I'm passionate about creating innovative solutions and helping businesses grow through strategic technology implementation.</p>
+                <p>With a background in technology and business, I specialize in bridging the gap between complex technical concepts and practical business applications. I believe in simplicity, efficiency, and creating technology that serves real human needs.</p>  
+              </div>
+            </Prose>
+          </div>
+          <Image src={Ava} alt="Akrem Berhanu" width={300}  class="rounded-3xl rotate-3 mx-4 md:mx-0"/>
+        </div>     
+        </article>
+      </article>
+    </main>
+  </div>
+</BaseLayout>

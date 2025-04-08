@@ -1,0 +1,210 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectStatus from './ProjectStatus.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, description, tags = [], githubLink, demoLink, status } = project.data;
+
+// Truncate description
+const truncatedDescription = description.length > 100
+  ? description.substring(0, 100).trim() + '...'
+  : description;
+---
+
+<div class="project-card rounded-lg overflow-hidden bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all h-full flex flex-col" data-status="{status}" data-tags="{tags.join(',')}" data-project-id="{project.id}">
+  <div class="p-6 flex flex-col h-full">
+    <!-- Top section: Tags + Status with consistent height -->
+    <div class="card-header flex justify-between items-start mb-4 min-h-[32px]">
+      <div class="tag-container flex overflow-hidden max-w-[70%]">
+        {tags && tags.map((tag, index) => (
+          <span 
+            class={`tag text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-zinc-300 whitespace-nowrap flex-shrink-0 ${index > 0 ? 'ml-2' : ''}`}
+            data-tag-index={index}
+          >
+            {tag}
+          </span>
+        ))}
+        <span 
+          class="tag-more text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-zinc-300 opacity-70 cursor-help whitespace-nowrap ml-1 hidden"
+        >
+          +0
+        </span>
+      </div>
+      <ProjectStatus statusId={status} showEmoji={true} />
+    </div>
+    
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+      {title}
+    </h3>
+    
+    <p class="text-gray-700 dark:text-zinc-300 mb-6 line-clamp-3 flex-grow">
+      {truncatedDescription}
+    </p>
+    
+    <div class="flex flex-wrap gap-4 mt-auto">
+      <a href={`/project/${project.slug}`} class="text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-zinc-300 transition-colors">
+        Details
+      </a>
+      
+      {githubLink && (
+        <a href={githubLink} target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-zinc-300 transition-colors flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      )}
+      
+      {demoLink && (
+        <a href={demoLink} target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-zinc-300 transition-colors flex items-center gap-1">
+          Demo
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
+            <path d="M15 3h6v6"></path>
+            <path d="M10 14L21 3"></path>
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+          </svg>
+        </a>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Tag container styles */
+  .tag-container {
+    display: flex;
+    flex-wrap: nowrap; /* Don't wrap tags */
+    gap: 0; /* We'll use margin-left instead for more control */
+    max-width: 70%;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .tag {
+    white-space: nowrap;
+    flex-shrink: 0; /* Don't shrink tags */
+  }
+  
+  .tag-more {
+    flex-shrink: 1; /* Allow more tag to shrink a bit */
+  }
+  
+  .card-header {
+    contain: layout style;
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    div.p-6 {
+      padding: 1rem;
+    }
+    
+    span.text-xs {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+    
+    h3.text-xl {
+      font-size: 1.1rem;
+    }
+    
+    p.line-clamp-3 {
+      -webkit-line-clamp: 2; /* Show fewer lines on mobile */
+    }
+    
+    .tag-container {
+      max-width: 65%;
+    }
+  }
+  
+  /* Performance optimization */
+  div.rounded-lg {
+    contain: content;
+  }
+</style>
+
+<script>
+  // When the DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle each card separately
+    document.querySelectorAll('.card-header').forEach(header => {
+      const tagContainer = header.querySelector('.tag-container');
+      if (!tagContainer) return;
+      
+      const statusBadge = header.querySelector('.project-status');
+      if (!statusBadge) return;
+      
+      const tags = Array.from(tagContainer.querySelectorAll('.tag:not(.tag-more)'));
+      const moreTag = tagContainer.querySelector('.tag-more');
+      if (!moreTag || tags.length === 0) return;
+      
+      // Function to check and adjust visible tags
+      function adjustVisibleTags() {
+        // Reset visibility
+        tags.forEach(tag => tag.style.display = 'flex');
+        moreTag.style.display = 'none';
+        
+        // Calculate available space
+        const containerWidth = tagContainer.clientWidth;
+        const statusWidth = statusBadge.offsetWidth;
+        const headerWidth = header.clientWidth;
+        const availableWidth = headerWidth - statusWidth - 16; // 16px for spacing
+        
+        // Start with all tags visible and calculate total width
+        let visibleTags = tags.length;
+        let currentWidth = 0;
+        
+        // Calculate how many tags fit within the available width
+        for (let i = 0; i < tags.length; i++) {
+          const tagWidth = tags[i].offsetWidth;
+          
+          // If adding this tag would exceed the available width
+          if (currentWidth + tagWidth > availableWidth) {
+            visibleTags = i;
+            break;
+          }
+          
+          currentWidth += tagWidth;
+        }
+        
+        // If not all tags fit
+        if (visibleTags < tags.length) {
+          // Check if we need to make room for the "+X" tag
+          const moreTagWidth = 40; // Approximate width for "+X" tag
+          
+          // Recalculate if adding the "+X" tag would exceed available width
+          if (currentWidth + moreTagWidth > availableWidth && visibleTags > 0) {
+            visibleTags -= 1;
+          }
+          
+          // Hide extra tags
+          tags.forEach((tag, i) => {
+            if (i >= visibleTags) {
+              tag.style.display = 'none';
+            }
+          });
+          
+          // Show "+X" tag
+          if (visibleTags < tags.length) {
+            moreTag.textContent = `+${tags.length - visibleTags}`;
+            moreTag.style.display = 'flex';
+            
+            // Set tooltip with hidden tag names
+            const hiddenTags = tags.slice(visibleTags).map(tag => tag.textContent.trim());
+            moreTag.setAttribute('title', hiddenTags.join(', '));
+          }
+        }
+      }
+      
+      // Run initially
+      adjustVisibleTags();
+      
+      // Add resize listener to adjust on window resize
+      window.addEventListener('resize', adjustVisibleTags);
+    });
+  });
+</script>

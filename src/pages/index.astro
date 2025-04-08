@@ -1,0 +1,71 @@
+---
+import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Ava from '@src/assets/img/ava.jpg';
+import Prose from '../components/Prose.astro';
+import ModernProjectList from '../components/ModernProjectList.astro'
+import PostItem from '../components/PostItem.astro';
+import { filterDraftContent } from '../utils';
+import MultilingualGreeting from '../components/MultilingualGreeting';
+
+type BlogPost = CollectionEntry<'blog'>;
+type Project = CollectionEntry<'projects'>;
+
+const allPosts = await getCollection('blog');
+const publishedPosts = filterDraftContent(allPosts);
+const posts = publishedPosts
+  .sort((a: BlogPost, b: BlogPost) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+
+const allProjects = await getCollection('projects');
+const publishedProjects = filterDraftContent(allProjects);
+const top6Projects = publishedProjects
+  .sort((a: Project, b: Project) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
+---
+
+<BaseLayout title={SITE_TITLE + ' - ' + SITE_TAGLINE} description={SITE_DESCRIPTION}>
+	<div class='container'>
+		<div class='w-full md:flex md:items-center gap-16 mb-10 pb-8 border-b dark:border-zinc-800'>
+      <div class="text-pretty leading-9">
+        <!-- Replace the static h1 with the MultilingualGreeting component -->
+        <MultilingualGreeting client:load />
+        <Prose>
+          <div class="text-lg">
+            <p>I am a builder, thinker, and consultant from Houston, TX. With a passion for technology and problem-solving, I help businesses bridge the gap between strategy and execution.</p>
+            <p>Through my work, I explore the intersection of technology, business, and human-centered design. I believe in building solutions that are not only technically sound but also intuitive and accessible to users.</p>  
+          </div>
+        </Prose>
+      </div>
+      <Image src={Ava} alt="Akrem Berhanu" width={300} loading="eager" class="rounded-3xl rotate-3 mx-4 md:mx-0"/>
+		</div>
+		<main>
+      <!-- Projects Section Comes First -->
+      <div class='mt-6 mb-12 pb-8 -mx-6 px-6 bg-zinc-100 dark:bg-zinc-800 p-6 border-t border-b border-zinc-200 dark:border-zinc-700'>
+        <div class="flex justify-between gap-2 border-b mb-6 pb-3 dark:border-b-zinc-700">
+          <h2 class="text-2xl font-bold mb-0">My Projects</h2>
+          <a href="/project/" class="inline-block py-2 underline dark:prose-invert">All projects &raquo;</a>
+        </div>
+        <ModernProjectList projects={top6Projects}/>
+      </div>
+      
+      <!-- Recent Posts Section Comes Second -->
+      <div class='mt-12 mb-12 -mx-6 px-6 bg-zinc-50 dark:bg-zinc-900/80 p-6 border-t border-b border-zinc-200 dark:border-zinc-700'>
+        <div class="flex justify-between gap-2 border-b mb-6 pb-3 dark:border-b-zinc-700">
+          <h2 class="text-2xl font-bold mb-0">Recent Posts</h2>
+          <a href="/posts/" class="inline-block py-2 underline dark:prose-invert">All posts &raquo;</a>
+        </div>
+        <div>
+          {
+            posts.map((post: BlogPost) => (
+              <PostItem post={post} />
+            ))
+          }      
+        </div>
+      </div>
+		</main>
+	</div>
+</BaseLayout>

@@ -1,0 +1,45 @@
+---
+import { getStatusById } from '../config/projectStatus';
+
+interface Props {
+  statusId: string;
+  showEmoji?: boolean;
+  className?: string;
+}
+
+const { statusId, showEmoji = true, className = '' } = Astro.props;
+const status = getStatusById(statusId);
+
+if (!status) {
+  return null;
+}
+
+// Create the status badge style based on the status color
+const bgColor = `rgb(${status.color})`;
+const textColor = 'rgb(0, 0, 0, 0.8)'; // Dark text for contrast
+---
+
+<span 
+  class={`project-status text-xs px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 flex items-center ${className}`}
+  data-status-id={status.id}
+  data-status-category={status.category}
+  style={`background-color: ${status.color}; color: ${textColor};`}
+>
+  {showEmoji && <span class="mr-1">{status.emoji}</span>}
+  {status.label}
+</span>
+
+<style>
+  /* Dark mode styles */
+  :global(.dark) .project-status[data-status-category="planning"] {
+    background-color: #7FBFE0 !important;
+  }
+  
+  :global(.dark) .project-status[data-status-category="in-progress"] {
+    background-color: #FF9933 !important;
+  }
+  
+  :global(.dark) .project-status[data-status-category="completed"] {
+    background-color: #8ED1A2 !important;
+  }
+</style>

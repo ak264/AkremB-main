@@ -1,0 +1,59 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import BlogYearHeader from '../components/BlogYearHeader.astro';
+import BlogPostHeader from '../components/BlogPostHeader.astro';
+import BlogPostProjects from '../components/BlogPostProjects.astro';
+import { slugify } from '../utils';
+
+const { post, content } = Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  tags,
+  status
+} = post.data;
+
+// Get the year from the post date
+const year = new Date(pubDate).getFullYear();
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container max-w-3xl mx-auto px-4 py-12 blog-content">
+    <BlogYearHeader year={year} />
+    <BlogPostHeader title={title} date={pubDate} status={status} />
+    
+    <article>
+      <div class="prose dark:prose-invert max-w-none">
+        <slot />
+      </div>
+    </article>
+    
+    {tags && tags.length > 0 && (
+      <div class="mt-8 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag: string) => (
+            <a 
+              href={`/tags/${slugify(tag)}`}
+              class="border border-zinc-300 dark:border-zinc-700 rounded-full 
+                    text-sm text-zinc-700 dark:text-zinc-300 px-3 py-1
+                    transition-all duration-200
+                    hover:border-zinc-500 dark:hover:border-zinc-500"
+            >
+              {tag}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+    
+    <BlogPostProjects postSlug={post.slug} />
+  </div>
+</BaseLayout>
+
+<style>
+  /* Dark mode styling that works with theme toggle */
+  :global(.dark) .blog-content {
+    @apply bg-zinc-900 text-white;
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+
+// Get the slug of the current blog post
+const { postSlug } = Astro.props;
+
+// Get all projects
+const allProjects = await getCollection('projects');
+
+// Find projects that list this blog post in their relatedPosts
+const relatedProjects = allProjects.filter(project => 
+  project.data.relatedPosts?.includes(postSlug)
+);
+---
+
+{relatedProjects.length > 0 && (
+  <div class="mt-12 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+    <h3 class="text-lg font-bold mb-4">Related Projects</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {relatedProjects.map(project => (
+        <a 
+          href={`/project/${project.slug}`}
+          class="flex flex-col p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <h4 class="text-md font-semibold">{project.data.title}</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{project.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+)}

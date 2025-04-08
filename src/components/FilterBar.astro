@@ -1,0 +1,529 @@
+---
+// FilterBar.astro
+import { projectStatuses, statusCategories } from '../config/projectStatus';
+
+export interface Props {
+  tags: string[];
+  projects: any[]; // Replace with your actual project type
+  baseUrl: string;
+  showStatusFilter?: boolean;
+}
+
+const { tags, projects, baseUrl, showStatusFilter = true } = Astro.props;
+
+// Props already destructured above
+
+// Calculate counts for each tag
+const tagCounts = tags.reduce((acc, tag) => {
+  acc[tag] = projects.filter(project => project.data.tags?.includes(tag)).length;
+  return acc;
+}, {});
+
+// Calculate counts for each status
+const statusCounts = projectStatuses.reduce((acc, status) => {
+  acc[status.id] = projects.filter(project => project.data.status === status.id).length;
+  return acc;
+}, {});
+
+// Group statuses by category with counts
+const groupedStatuses = Object.values(statusCategories).map(category => {
+  const statuses = projectStatuses.filter(status => status.category === category.id);
+  return {
+    category,
+    statuses
+  };
+});
+---
+
+<div class="filter-bar w-full flex items-center gap-3 bg-white dark:bg-zinc-800/80 px-4 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-sm mb-6"
+     data-show-status-filter={showStatusFilter.toString()}>
+  <!-- Search input -->
+  <div class="relative flex-grow max-w-md">
+    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+    <input 
+      type="search" 
+      id="search-input" 
+      class="block w-full pl-10 pr-3 py-2 text-sm bg-gray-50 dark:bg-zinc-700/50 border border-gray-300 dark:border-zinc-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+      placeholder="Search titles..."
+    >
+  </div>
+  
+  <!-- Status filter dropdown (conditional) -->
+  {showStatusFilter && (
+    <div class="relative inline-block" data-dropdown="status">
+      <button 
+        type="button" 
+        class="dropdown-button flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200"
+        aria-haspopup="true" 
+        aria-expanded="false"
+        aria-controls="status-dropdown"
+      >
+        <span id="status-selected" class="whitespace-nowrap">Status</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+      
+      <div 
+        id="status-dropdown" 
+        class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white dark:bg-zinc-800 ring-1 ring-black ring-opacity-5 border border-gray-200 dark:border-zinc-700 z-10 hidden"
+        role="menu"
+        aria-orientation="vertical"
+        tabindex="-1"
+      >
+        <div class="py-2 px-3 max-h-60 overflow-y-auto">
+          <button 
+            class="dropdown-item w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-700 flex items-center justify-between" 
+            data-value="all"
+            role="menuitem"
+          >
+            <span class="font-medium">All Statuses</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{projects.length}</span>
+          </button>
+          
+          <div class="h-px bg-gray-200 dark:bg-zinc-700 my-1.5"></div>
+          
+          {groupedStatuses.map(group => (
+            <div class="mb-2">
+              <div class="px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                {group.category.emoji} {group.category.label}
+              </div>
+              
+              {group.statuses.map(status => (
+                <button 
+                  class="dropdown-item w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-700 flex items-center justify-between" 
+                  data-value={status.id}
+                  role="menuitem"
+                >
+                  <span class="flex items-center gap-2">
+                    <span>{status.emoji}</span>
+                    <span>{status.label}</span>
+                  </span>
+                  <span class="text-xs text-gray-400 dark:text-gray-500">{statusCounts[status.id] || 0}</span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+  
+  <!-- Tags filter dropdown -->
+  <div class="relative inline-block" data-dropdown="tag">
+    <button 
+      type="button" 
+      class="dropdown-button flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200"
+      aria-haspopup="true" 
+      aria-expanded="false"
+      aria-controls="tag-dropdown"
+    >
+      <span id="tag-selected" class="whitespace-nowrap">Tag</span>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </button>
+    
+    <div 
+      id="tag-dropdown" 
+      class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white dark:bg-zinc-800 ring-1 ring-black ring-opacity-5 border border-gray-200 dark:border-zinc-700 z-10 hidden"
+      role="menu"
+      aria-orientation="vertical"
+      tabindex="-1"
+    >
+      <div class="py-2 px-3 max-h-60 overflow-y-auto">
+        <button 
+          class="dropdown-item w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-700 flex items-center justify-between" 
+          data-value="all"
+          role="menuitem"
+        >
+          <span class="font-medium">All Tags</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500">{projects.length}</span>
+        </button>
+        
+        <div class="h-px bg-gray-200 dark:bg-zinc-700 my-1.5"></div>
+        
+        {tags.map(tag => (
+          <button 
+            class="dropdown-item w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-700 flex items-center justify-between" 
+            data-value={tag}
+            role="menuitem"
+          >
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              <span>{tag}</span>
+            </span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{tagCounts[tag] || 0}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Active filters display -->
+  <div id="active-filters" class="flex items-center gap-2">
+    <!-- Filters will be injected here via JavaScript -->
+  </div>
+  
+  <!-- Clear all button - initially hidden -->
+  <button 
+    id="clear-all-btn"
+    class="hidden whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+  >
+    Clear All
+  </button>
+</div>
+
+<script>
+  // Initialize filtering logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterBar = document.querySelector('.filter-bar');
+    const showStatusFilter = filterBar?.getAttribute('data-show-status-filter') === 'true';
+    
+    const dropdownButtons = document.querySelectorAll('.dropdown-button');
+    const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    const statusSelected = document.getElementById('status-selected');
+    const tagSelected = document.getElementById('tag-selected');
+    const activeFilters = document.getElementById('active-filters');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    const searchInput = document.getElementById('search-input');
+    
+    // Track active filters
+    const filters = {
+      status: null,
+      tag: null,
+      search: ''
+    };
+    
+    // Toggle dropdown visibility
+    dropdownButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const type = button.closest('[data-dropdown]').getAttribute('data-dropdown');
+        const menu = document.getElementById(`${type}-dropdown`);
+        
+        // Close other dropdowns
+        dropdownMenus.forEach(dropdown => {
+          if (dropdown.id !== `${type}-dropdown`) {
+            dropdown.classList.add('hidden');
+            dropdown.previousElementSibling.setAttribute('aria-expanded', 'false');
+          }
+        });
+        
+        // Toggle current dropdown
+        menu.classList.toggle('hidden');
+        const isExpanded = !menu.classList.contains('hidden');
+        button.setAttribute('aria-expanded', isExpanded.toString());
+        
+        e.stopPropagation();
+      });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+      dropdownMenus.forEach(menu => {
+        menu.classList.add('hidden');
+        menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+      });
+    });
+    
+    // Handle dropdown item selection
+    dropdownItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const type = item.closest('.dropdown-menu').id.split('-')[0]; // 'status' or 'tag'
+        const value = item.getAttribute('data-value');
+        const label = item.querySelector('span:first-child').textContent.trim();
+        
+        // Update selected label
+        if (type === 'status') {
+          statusSelected.textContent = value === 'all' ? 'Status' : label;
+          filters.status = value === 'all' ? null : value;
+        } else {
+          tagSelected.textContent = value === 'all' ? 'Tag' : label;
+          filters.tag = value === 'all' ? null : value;
+        }
+        
+        // Update active filters
+        updateActiveFilters();
+        
+        // Apply filters
+        applyFilters();
+        
+        // Close dropdown
+        const menu = item.closest('.dropdown-menu');
+        menu.classList.add('hidden');
+        menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+      });
+    });
+    
+    // Handle search input
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        filters.search = searchInput.value.trim().toLowerCase();
+        updateActiveFilters();
+        applyFilters();
+      });
+    }
+    
+    // Clear all filters
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener('click', () => {
+        // Reset all filters (but only status if it's being shown)
+        if (showStatusFilter) {
+          filters.status = null;
+          if (statusSelected) statusSelected.textContent = 'Status';
+        }
+        
+        filters.tag = null;
+        filters.search = '';
+        
+        // Reset UI
+        tagSelected.textContent = 'Tag';
+        if (searchInput) searchInput.value = '';
+        
+        // Update UI
+        updateActiveFilters();
+        applyFilters();
+      });
+    }
+    
+    // Listen for external filter updates (from tag buttons in posts)
+    document.addEventListener('filter:updated', (event) => {
+      const { filters: updatedFilters } = event.detail;
+      if (updatedFilters) {
+        Object.assign(filters, updatedFilters);
+        updateActiveFilters();
+        applyFilters();
+      }
+    });
+    
+    // Update active filters display
+    function updateActiveFilters() {
+      if (!activeFilters) return;
+      
+      // Clear current filters
+      activeFilters.innerHTML = '';
+      
+      // Check if we have any active filters
+      // Only include status in this check if showStatusFilter is true
+      const hasActiveFilters = (showStatusFilter && filters.status) || filters.tag || filters.search;
+      if (clearAllBtn) {
+        clearAllBtn.classList.toggle('hidden', !hasActiveFilters);
+      }
+      
+      // If no active filters, return
+      if (!hasActiveFilters) return;
+      
+      // Add filter pills
+      if (showStatusFilter && filters.status) {
+        const statusItem = document.querySelector(`.dropdown-item[data-value="${filters.status}"]`);
+        const emoji = statusItem?.querySelector('span span:first-child')?.textContent || '';
+        const label = statusItem?.querySelector('span span:nth-child(2)')?.textContent || '';
+        
+        const pill = createFilterPill('status', `${emoji} ${label}`);
+        activeFilters.appendChild(pill);
+      }
+      
+      if (filters.tag) {
+        const pill = createFilterPill('tag', filters.tag);
+        activeFilters.appendChild(pill);
+      }
+      
+      if (filters.search) {
+        const pill = createFilterPill('search', `"${filters.search}"`);
+        activeFilters.appendChild(pill);
+      }
+    }
+    
+    // Create a filter pill element
+    function createFilterPill(type, label) {
+      const pill = document.createElement('div');
+      pill.className = 'filter-pill flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs';
+      
+      const text = document.createElement('span');
+      text.textContent = label;
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'ml-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 w-4 h-4 flex items-center justify-center';
+      closeBtn.innerHTML = '×';
+      closeBtn.setAttribute('aria-label', `Remove ${type} filter`);
+      
+      closeBtn.addEventListener('click', () => {
+        // Clear this specific filter
+        filters[type] = '';
+        if (type === 'status') statusSelected.textContent = 'Status';
+        if (type === 'tag') tagSelected.textContent = 'Tag';
+        if (type === 'search' && searchInput) searchInput.value = '';
+        
+        // Update UI
+        updateActiveFilters();
+        applyFilters();
+      });
+      
+      pill.appendChild(text);
+      pill.appendChild(closeBtn);
+      return pill;
+    }
+    
+    // Apply filters to content
+    function applyFilters() {
+      // Build URL with filters
+      let url = new URL(window.location.href);
+      url.searchParams.delete('status');
+      url.searchParams.delete('tag');
+      url.searchParams.delete('search');
+      
+      // Only add status parameter if showStatusFilter is true
+      if (showStatusFilter && filters.status) {
+        url.searchParams.set('status', filters.status);
+      }
+      
+      if (filters.tag) url.searchParams.set('tag', filters.tag);
+      if (filters.search) url.searchParams.set('search', filters.search);
+      
+      // Update URL without reloading page
+      window.history.pushState({}, '', url);
+      
+      // Filter content - get either project cards or post cards
+      const projectCards = document.querySelectorAll('.project-card, .post-card');
+      let visibleCount = 0;
+      
+      projectCards.forEach(card => {
+        let visible = true;
+        
+        // Status filter - only apply if showStatusFilter is true
+        if (showStatusFilter && filters.status) {
+          // Try getting status from various places
+          let statusFound = false;
+          
+          // Option 1: Direct attribute on card
+          const itemStatusAttr = card.getAttribute('data-status');
+          if (itemStatusAttr === filters.status) {
+            statusFound = true;
+          }
+          
+          // Option 2: From status badge element
+          if (!statusFound) {
+            const statusElement = card.querySelector('.project-status');
+            const itemStatusFromElement = statusElement?.getAttribute('data-status-id');
+            if (itemStatusFromElement === filters.status) {
+              statusFound = true;
+            }
+          }
+          
+          // If no status match found, hide the card
+          if (!statusFound) {
+            visible = false;
+          }
+        }
+        
+        // Tag filter
+        if (filters.tag && visible) {
+          const tagsAttribute = card.getAttribute('data-tags') || '';
+          const itemTags = tagsAttribute ? tagsAttribute.split(',') : [];
+          const tagElements = card.querySelectorAll('.tag');
+          const hasTag = [...tagElements].some(tag => tag.textContent.trim() === filters.tag) || itemTags.includes(filters.tag);
+          if (!hasTag) visible = false;
+        }
+        
+        // Search filter
+        if (filters.search && visible) {
+          const title = card.querySelector('h3')?.textContent?.toLowerCase() || '';
+          const description = card.querySelector('p')?.textContent?.toLowerCase() || '';
+          if (!title.includes(filters.search) && !description.includes(filters.search)) visible = false;
+        }
+        
+        // Show/hide item
+        if (visible) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Show/hide no results message
+      const noResults = document.getElementById('no-results');
+      const projectsGrid = document.querySelector('.projects-grid');
+      const postsGrid = document.querySelector('.posts-grid');
+      const contentGrid = projectsGrid || postsGrid;
+      
+      if (noResults && contentGrid) {
+        if (visibleCount === 0) {
+          noResults.style.display = '';
+          contentGrid.style.display = 'none';
+        } else {
+          noResults.style.display = 'none';
+          contentGrid.style.display = '';
+        }
+      }
+    }
+    
+    // Initialize from URL parameters
+    function initFromUrl() {
+      const url = new URL(window.location.href);
+      
+      // Only initialize status if showStatusFilter is true
+      if (showStatusFilter) {
+        const statusParam = url.searchParams.get('status');
+        if (statusParam) {
+          filters.status = statusParam;
+          const statusItem = document.querySelector(`.dropdown-item[data-value="${statusParam}"]`);
+          if (statusItem) {
+            const label = statusItem.querySelector('span:first-child').textContent.trim();
+            statusSelected.textContent = label;
+          }
+        }
+      }
+      
+      const tagParam = url.searchParams.get('tag');
+      if (tagParam) {
+        filters.tag = tagParam;
+        tagSelected.textContent = tagParam;
+      }
+      
+      const searchParam = url.searchParams.get('search');
+      if (searchParam && searchInput) {
+        filters.search = searchParam;
+        searchInput.value = searchParam;
+      }
+      
+      updateActiveFilters();
+      applyFilters();
+    }
+    
+    // Initialize
+    initFromUrl();
+  });
+</script>
+
+<style>
+  /* Dropdown menu animation */
+  .dropdown-menu {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 150ms ease, transform 150ms ease;
+  }
+  
+  .dropdown-menu:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Style active dropdown items */
+  .dropdown-item.active {
+    @apply bg-gray-100 dark:bg-zinc-700 font-medium;
+  }
+  
+  /* Make sure the filter bar doesn't wrap on smaller screens */
+  @media (max-width: 768px) {
+    .filter-bar {
+      @apply overflow-x-auto flex-nowrap py-3;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+</style>
