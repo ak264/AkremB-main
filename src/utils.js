@@ -25,6 +25,28 @@ export function slugify(text) {
 }
 
 /**
+ * Safely convert a date to ISO string, handling invalid dates
+ * @param {Date|string} date The date to convert
+ * @returns {string} ISO string or fallback string
+ */
+export function safeISOString(date) {
+  try {
+    // Make sure it's a Date object
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    // Verify it's a valid date
+    if (isNaN(dateObj.getTime())) {
+      return new Date().toISOString(); // Fallback to current date
+    }
+    
+    return dateObj.toISOString();
+  } catch (error) {
+    console.error("Error converting date to ISO string:", error);
+    return new Date().toISOString(); // Fallback to current date
+  }
+}
+
+/**
  * Fetch repository details from GitHub
  * @param {string} repoPath Repository path in the format 'username/repo'
  * @returns {Promise<object>} Repository details
