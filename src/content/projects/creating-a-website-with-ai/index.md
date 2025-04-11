@@ -1,7 +1,7 @@
 ---
 title: 'Creating a Website with AI'
 description: 'How I used AI tools to design and build a modern website'
-pubDate: 'Apr 04 2025'
+pubDate: '2025-04-04T12:00:00Z'
 tags: ["AI", "Web Development", "Design"]
 demoLink: 'https://example.com/ai-website'
 githubLink: 'https://github.com/yourusername/ai-website'
