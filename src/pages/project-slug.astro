@@ -1,14 +1,13 @@
 ---
-// This file will be renamed to src/pages/project/[...slug].astro
-// Copy the contents to that file if you're able to access the filesystem directly
+// This file is just a template. Don't use it directly.
 
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Prose from '../../components/Prose.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prose from '../components/Prose.astro';
 import type { CollectionEntry } from 'astro:content';
-import ProjectHeader from '../../components/ProjectHeader.astro';
+import ProjectHeader from '../components/ProjectHeader.astro';
 import { Image } from 'astro:assets';
-import { filterDraftContent } from '../../utils';
+import { filterDraftContent } from '../utils';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
