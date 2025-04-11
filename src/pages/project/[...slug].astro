@@ -23,8 +23,7 @@ const project = Astro.props;
 const { Content } = await project.render();
 
 // Create safe date values
-const safePubDate = project.data.pubDate ? safeISOString(project.data.pubDate) : null;
-
+const safePubDate = project.data.pubDate ? new Date(project.data.pubDate).toISOString() : null;
 // Get related blog posts if any
 const allBlogPosts = await getCollection('blog');
 // Filter out draft blog posts
