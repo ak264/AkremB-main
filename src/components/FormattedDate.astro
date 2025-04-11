@@ -1,18 +1,50 @@
 ---
+// src/components/FormattedDate.astro
 interface Props {
-	date: Date;
+  // Allow string, number, or Date, as data sources might vary
+	date: Date | string | number | null | undefined;
 }
 
-const { date } = Astro.props;
+const { date: dateProp } = Astro.props;
+
+let dateObject: Date | null = null;
+let isValidDate = false;
+
+// Try to create a valid Date object
+if (dateProp instanceof Date && !isNaN(dateProp.getTime())) {
+  // It's already a valid Date object
+  dateObject = dateProp;
+  isValidDate = true;
+} else if (typeof dateProp === 'string' || typeof dateProp === 'number') {
+  // Attempt to parse if it's a string or number
+  try {
+    const parsedDate = new Date(dateProp);
+    if (!isNaN(parsedDate.getTime())) {
+      dateObject = parsedDate;
+      isValidDate = true;
+    }
+  } catch (e) {
+    // Parsing failed, leave isValidDate as false
+    console.error("FormattedDate component failed to parse date:", dateProp, e);
+  }
+}
+
+// Fallback text if the date is not valid
+const fallbackText = "Date unavailable";
 ---
 
-<time datetime={date.toISOString()}>
-	{
-		date.toLocaleDateString('en-us', {
-			year: 'numeric',
-			month: 'short',
-			day: '2-digit',
-			timeZone: 'UTC',
-		})
-	}
-</time>
+{isValidDate && dateObject ? (
+  <time datetime={dateObject.toISOString()}>
+    {
+      dateObject.toLocaleDateString('en-us', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        timeZone: 'UTC', // Keep UTC if your source dates are UTC based
+      })
+    }
+  </time>
+) : (
+  // Render fallback text if the date was invalid or missing
+  <span>{fallbackText}</span>
+)}
