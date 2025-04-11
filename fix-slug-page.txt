@@ -1,0 +1,7 @@
+Here is a plan to locate and fix the issue:
+
+1. We need to check the [...slug].astro file in the project directory
+2. We previously fixed the frontmatter date formats in the markdown files but the error still occurs
+3. There might be additional date handling in the project slug page template
+
+Let's modify the project slug page to handle potential date issues more robustly by adding a safeguard for the pubDate.toISOString call.
