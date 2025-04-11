@@ -1,7 +1,7 @@
 ---
 title: 'Portfolio Website'
 description: 'My professional web development portfolio'
-pubDate: 'Apr 04 2025'
+pubDate: '2025-04-04T12:00:00Z'
 tags: ["Web Development", "Portfolio"]
 demoLink: 'https://yourportfolio.com'
 githubLink: 'https://github.com/yourusername/portfolio'
