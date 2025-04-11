@@ -16,5 +16,9 @@ export default defineConfig({
     rehypePlugins: [[autoNewTabExternalLinks, {
       domain: 'localhost:4321'
     }]]
+  },
+  // Added build configuration to troubleshoot GitHub Pages deployment
+  build: {
+    format: 'file'
   }
 });
