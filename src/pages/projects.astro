@@ -1,6 +1,15 @@
 ---
 // This file redirects correctly to the project folder
-export const prerender = false;
-import { redirect } from 'astro/middleware';
-const response = redirect('/project/');
+export function getStaticPaths() {
+  return [];
+}
+
+export async function get() {
+  return {
+    status: 301,
+    headers: {
+      Location: '/project/'
+    }
+  };
+}
 ---
