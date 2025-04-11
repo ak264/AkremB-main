@@ -1,4 +1,17 @@
 ---
-import { redirect } from 'astro';
-return redirect('/tag/');
+// This file redirects correctly to the tag folder
 ---
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="refresh" content="0;url=/tag/" />
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p>Redirecting to <a href="/tag/">/tag/</a>...</p>
+  <script>
+    window.location.href = "/tag/";
+  </script>
+</body>
+</html>
