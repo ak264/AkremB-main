@@ -8,17 +8,19 @@ const { title, description, pubDate, updatedDate, coverImage } = content.data;
 
 <div class="mb-8">
   {coverImage && (
-    <div class="mb-6">
-      <Image
-        src={coverImage}
-        alt={`Cover image for ${title}`}
-        width={1020}
-        height={510}
-        class="rounded-xl shadow-md"
-      />
-    </div>
+    <>
+      <div class="mb-6">
+        <Image
+          src={coverImage}
+          alt={`Cover image for ${title}`}
+          width={1020}
+          height={510}
+          class="rounded-xl shadow-md"
+        />
+      </div>
+    </>
   )}
-  
+
   <h1 class="text-4xl font-bold mb-2">{title}</h1>
   
   <div class="text-gray-600 dark:text-gray-400 mb-4">
@@ -26,11 +28,13 @@ const { title, description, pubDate, updatedDate, coverImage } = content.data;
       {formatDate(pubDate)}
     </time>
     {updatedDate && (
-      <span>
-        • Updated on <time datetime={updatedDate.toISOString()}>
-          {formatDate(updatedDate)}
-        </time>
-      </span>
+      <>
+        <span>
+          • Updated on <time datetime={updatedDate.toISOString()}>
+            {formatDate(updatedDate)}
+          </time>
+        </span>
+      </>
     )}
   </div>
   
