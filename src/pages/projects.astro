@@ -1,15 +1,17 @@
 ---
 // This file redirects correctly to the project folder
-export function getStaticPaths() {
-  return [];
-}
-
-export async function get() {
-  return {
-    status: 301,
-    headers: {
-      Location: '/project/'
-    }
-  };
-}
 ---
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="refresh" content="0;url=/project/" />
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p>Redirecting to <a href="/project/">/project/</a>...</p>
+  <script>
+    window.location.href = "/project/";
+  </script>
+</body>
+</html>
