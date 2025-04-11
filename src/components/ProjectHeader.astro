@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+---
+
+<header class="mb-8">
+  <h1 class="text-3xl font-bold mb-2">{project.data.title}</h1>
+  
+  <div class="flex flex-wrap gap-2 items-center mt-2 mb-4">
+    <span class="text-zinc-500 dark:text-zinc-400 text-sm">
+      <FormattedDate date={project.data.pubDate} />
+      {project.data.updatedDate && (
+        <span> (Updated: <FormattedDate date={project.data.updatedDate} />)</span>
+      )}
+    </span>
+    
+    {project.data.tags && project.data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {project.data.tags.map((tag: string) => (
+          <a
+            href={`/project/?tag=${tag}`}
+            class="text-sm px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+          >
+            #{tag}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+  
+  <p class="text-lg text-zinc-700 dark:text-zinc-300">{project.data.description}</p>
+</header>
