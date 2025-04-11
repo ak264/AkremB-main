@@ -25,6 +25,41 @@ export function slugify(text) {
 }
 
 /**
+ * Fetch repository details from GitHub
+ * @param {string} repoPath Repository path in the format 'username/repo'
+ * @returns {Promise<object>} Repository details
+ */
+export async function getRepositoryDetails(repoPath) {
+  try {
+    // Use fetch API to get repository information from GitHub
+    const [owner, repo] = repoPath.split('/');
+    const response = await fetch(`https://api.github.com/repos/${repoPath}`);
+    
+    if (!response.ok) {
+      console.error(`Error fetching repo ${repoPath}: ${response.statusText}`);
+      return { description: '', gitHubLink: `https://github.com/${repoPath}` };
+    }
+    
+    const data = await response.json();
+    
+    return {
+      description: data.description || '',
+      gitHubLink: data.html_url,
+      stars: data.stargazers_count,
+      forks: data.forks_count,
+      lastUpdate: data.updated_at
+    };
+  } catch (error) {
+    console.error(`Error fetching repository details for ${repoPath}:`, error);
+    // Return basic information even if the fetch fails
+    return { 
+      description: '', 
+      gitHubLink: `https://github.com/${repoPath}`
+    };
+  }
+}
+
+/**
  * Filter out draft content in production
  * @param {Array} posts Array of blog posts
  * @returns {Array} Filtered array of posts
