@@ -1,5 +1,6 @@
 ---
 // This file redirects correctly to the project folder
-import { redirect } from 'astro';
-return redirect('/project/');
+export const prerender = false;
+import { redirect } from 'astro/middleware';
+const response = redirect('/project/');
 ---
