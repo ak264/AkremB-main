@@ -8,8 +8,7 @@ import partytown from "@astrojs/partytown";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://ak264.github.io',
-  base: '/AkremB-main', // Add this line for GitHub Pages deployment
+  site: 'https://akremberhanu.com',
   output: 'static',
   integrations: [mdx(), sitemap(), tailwind(), partytown(), react()],
   markdown: {
