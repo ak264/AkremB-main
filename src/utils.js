@@ -9,6 +9,22 @@ export function formatDate(date) {
 }
 
 /**
+ * Convert a string to a URL-friendly slug
+ * @param {string} text The text to slugify
+ * @returns {string} The slugified text
+ */
+export function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
+/**
  * Filter out draft content in production
  * @param {Array} posts Array of blog posts
  * @returns {Array} Filtered array of posts
