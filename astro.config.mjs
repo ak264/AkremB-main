@@ -19,6 +19,6 @@ export default defineConfig({
   },
   // Added build configuration to troubleshoot GitHub Pages deployment
   build: {
-    format: 'file'
+    format: 'directory'
   }
 });
