@@ -54,8 +54,9 @@ const sortedProjects = filteredProjects.sort((a, b) => b.data.pubDate.valueOf() 
     
     <FilterBar 
       tags={allTags} 
-      projects={allProjects} 
+      projects={allPublishedProjects} 
       baseUrl="/project/" 
+      showStatusFilter={true}
     />
     
     <div class="projects-grid">

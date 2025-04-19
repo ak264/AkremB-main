@@ -20,7 +20,7 @@ const truncatedDescription = description.length > 100
     <!-- Top section: Tags + Status with consistent height -->
     <div class="card-header flex justify-between items-start mb-4 min-h-[32px]">
       <div class="tag-container flex overflow-hidden max-w-[70%]">
-        {tags && tags.map((tag, index) => (
+        {tags && tags.map((tag: string, index: number) => (
           <span 
             class={`tag text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-zinc-300 whitespace-nowrap flex-shrink-0 ${index > 0 ? 'ml-2' : ''}`}
             data-tag-index={index}
@@ -29,7 +29,7 @@ const truncatedDescription = description.length > 100
           </span>
         ))}
         <span 
-          class="tag-more text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-zinc-300 opacity-70 cursor-help whitespace-nowrap ml-1 hidden"
+          class="tag-more text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-zinc-300 opacity-70 cursor-help whitespace-nowrap ml-1"
         >
           +0
         </span>
