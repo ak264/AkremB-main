@@ -24,6 +24,11 @@ type Props = {
 };
 
 const { project } = Astro.props;
+
+if (!project) {
+  return Astro.redirect('/404');
+}
+
 const { Content } = await project.render();
 
 // Find related posts if any are specified
