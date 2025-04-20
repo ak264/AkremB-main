@@ -6,6 +6,7 @@ tags: ["AI", "Web Development", "Design"]
 demoLink: 'https://example.com/ai-website'
 githubLink: 'https://github.com/yourusername/ai-website'
 relatedPosts: ['first-post']
+status: 'actively-building'
 ---
 
 ## The AI-Powered Web Development Process
