@@ -522,8 +522,14 @@ const groupedStatuses = Object.values(statusCategories).map(category => {
   /* Make sure the filter bar doesn't wrap on smaller screens */
   @media (max-width: 768px) {
     .filter-bar {
-      @apply overflow-x-auto flex-nowrap py-3;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible !important;
+    }
+    .dropdown-menu {
+      max-width: 90vw !important;
+      min-width: 0 !important;
+      /* Remove position: fixed, left/right, width: 100vw, top */
+      border-radius: 0 0 1rem 1rem;
+      z-index: 9999;
     }
   }
 </style>
