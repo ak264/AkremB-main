@@ -2,8 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 @layer base {
-	pre,
-	code {
-		font-size: 0.875rem;
-	}
+    pre,
+    code {
+        font-size: 0.875rem;
+    }
+    html,
+    body {
+        overflow-x: hidden;
+        touch-action: pan-y;
+    }
+    img,
+    picture,
+    video,
+    svg {
+        max-width: 100%;
+        height: auto;
+    }
 }

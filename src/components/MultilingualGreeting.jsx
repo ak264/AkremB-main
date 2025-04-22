@@ -7,7 +7,7 @@ const MultilingualGreeting = () => {
   
   // Text content only, emoji will be fixed in position
   const greetings = [
-    "Hi There, Akrem Here!",
+    "Hi, Akrem Here!",
     "السلام عليكم، أنا أكرم",
     "Hola, Soy Akrem!"
   ];
