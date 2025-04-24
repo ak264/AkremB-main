@@ -60,6 +60,9 @@ const description = 'Articles, guides, tutorials about front-end development.';
       <p class="text-zinc-700 dark:text-zinc-300 text-lg">{description}</p>
     </div>
     
+    <pre>{JSON.stringify(allPosts, null, 2)}</pre>
+    <pre>{JSON.stringify(allTags, null, 2)}</pre>
+    
     <FilterBar 
       tags={allTags} 
       projects={allPosts} 

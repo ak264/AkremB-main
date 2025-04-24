@@ -2,7 +2,7 @@
 title: 'How Real Is Vibe Coding?'
 description: 'A deep dive into the trend of "vibe coding" and its implications for modern development'
 pubDate: 'Apr 04 2025'
-tags: ["Coding", "Development", "Trends"]
+tags: ["Coding", "Development", "Trends","Codingtruth","Vibecoding"]
 status: 'building'
 ---
 
