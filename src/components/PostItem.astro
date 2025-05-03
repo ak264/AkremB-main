@@ -6,7 +6,7 @@ import type { CollectionEntry } from 'astro:content';
 type BlogPost = CollectionEntry<'blog'>;
 const { post }: Record<string, any> | { post: BlogPost } = Astro.props
 ---
-<div class='post-card flex flex-col sm:flex-row gap-2 sm:items-center border-b py-4 my-2 capitalize dark:border-b-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg px-3 transition-colors duration-200' data-tags="{(post.data.tags || []).join(',')}">
+<div class='post-card flex flex-col sm:flex-row gap-2 sm:items-center border-b py-4 my-2 capitalize dark:border-b-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg px-3 transition-colors duration-200' data-tags={(post.data.tags || []).join(',')}>
   <div class='text-zinc-700 text-sm w-24 dark:text-zinc-300 shrink-0'>
     <FormattedDate date={post.data.pubDate} />
   </div>
@@ -15,17 +15,30 @@ const { post }: Record<string, any> | { post: BlogPost } = Astro.props
       {post.data.title}
     </a>
   </h3>
-  <div class='flex gap-2 shrink-0'>
+  <div class='flex gap-2 shrink-0 items-center min-w-[60px]'>
     {
-      (post.data.tags || [] )?.map((tag: string) => (
-        <button
+      (post.data.tags && post.data.tags.length > 0) && (
+        <a
+          href={`/posts/?tag=${encodeURIComponent(post.data.tags[0])}`}
           class='tag border border-zinc-300 dark:border-zinc-700 rounded-2xl
           text-sm text-zinc-700 dark:text-zinc-300 no-underline px-2 py-0.5 cursor-pointer
           transition-all duration-700 hover:border-zinc-700 dark:hover:border-zinc-300'
-          data-value={tag}>
-          {tag}
-        </button>
-      ))
+          data-value={post.data.tags[0]}
+        >
+          {post.data.tags[0]}
+        </a>
+      )
+    }
+    {
+      (post.data.tags && post.data.tags.length > 1) && (
+        <span
+          class='tag-indicator border border-zinc-200 dark:border-zinc-700 rounded-2xl
+          text-xs text-zinc-500 dark:text-zinc-400 px-2 py-0.5 cursor-pointer select-none'
+          title={post.data.tags.slice(1).join(', ')}
+        >
+          +{post.data.tags.length - 1}
+        </span>
+      )
     }
   </div>
 </div>
@@ -33,49 +46,13 @@ const { post }: Record<string, any> | { post: BlogPost } = Astro.props
 <script>
   // Initialize tag filtering
   document.addEventListener('DOMContentLoaded', () => {
-    const tagButtons = document.querySelectorAll('.post-card .tag');
-    
-    tagButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const tag = button.getAttribute('data-value');
-        if (!tag) return;
-        
-        // Update the tag dropdown in the filter bar
-        const tagSelected = document.getElementById('tag-selected');
-        if (tagSelected) tagSelected.textContent = tag;
-        
-        // Update the filters and URL
-        const filters = {
-          status: null,
-          tag: tag,
-          search: document.getElementById('search-input')?.value || ''
-        };
-        
-        // Update URL
-        let url = new URL(window.location.href);
-        url.searchParams.delete('status');
-        url.searchParams.delete('tag');
-        url.searchParams.delete('search');
-        
-        if (filters.tag) url.searchParams.set('tag', filters.tag);
-        if (filters.search) url.searchParams.set('search', filters.search);
-        
-        // Update URL without reloading
-        window.history.pushState({}, '', url);
-        
-        // Create and dispatch a custom event to notify FilterBar
-        const filterEvent = new CustomEvent('filter:updated', { 
-          detail: { filters: filters }
-        });
-        document.dispatchEvent(filterEvent);
-      });
-    });
-    
-    // Listen for filter reset events
-    document.addEventListener('filters:reset', () => {
-      // Reset any active state on tag buttons if needed
-      const activeTags = document.querySelectorAll('.post-card .tag.active');
-      activeTags.forEach(tag => tag.classList.remove('active'));
-    });
+    // Remove old tag button click logic since tags are now anchor links
+  });
+  
+  // Listen for filter reset events
+  document.addEventListener('filters:reset', () => {
+    // Reset any active state on tag buttons if needed
+    const activeTags = document.querySelectorAll('.post-card .tag.active');
+    activeTags.forEach(tag => tag.classList.remove('active'));
   });
 </script>

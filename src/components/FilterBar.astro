@@ -244,7 +244,7 @@ const groupedStatuses = Object.values(statusCategories).map(category => {
           filters.status = value === 'all' ? null : value;
         } else {
           tagSelected.textContent = value === 'all' ? 'Tag' : label;
-          filters.tag = value === 'all' ? null : value;
+          filters.tag = value === 'all' ? null : value.toLowerCase();
         }
         
         // Update active filters
@@ -424,10 +424,11 @@ const groupedStatuses = Object.values(statusCategories).map(category => {
         // Tag filter
         if (filters.tag && visible) {
           const tagsAttribute = card.getAttribute('data-tags') || '';
-          const itemTags = tagsAttribute ? tagsAttribute.split(',') : [];
-          const tagElements = card.querySelectorAll('.tag');
-          const hasTag = [...tagElements].some(tag => tag.textContent.trim() === filters.tag) || itemTags.includes(filters.tag);
-          if (!hasTag) visible = false;
+          const itemTags = tagsAttribute
+            .split(',')
+            .map(t => t.trim().toLowerCase())
+            .filter(Boolean);
+          if (!itemTags.includes(filters.tag.toLowerCase())) visible = false;
         }
         
         // Search filter
@@ -444,6 +445,12 @@ const groupedStatuses = Object.values(statusCategories).map(category => {
         } else {
           card.style.display = 'none';
         }
+      });
+      
+      // Hide empty year sections when all posts under a year are filtered out
+      document.querySelectorAll('.posts-grid > div.mb-8').forEach(section => {
+        const visibleCards = section.querySelectorAll('.post-card:not([style*="display: none"])');
+        section.style.display = visibleCards.length > 0 ? '' : 'none';
       });
       
       // Show/hide no results message
@@ -473,7 +480,7 @@ const groupedStatuses = Object.values(statusCategories).map(category => {
         if (statusParam) {
           filters.status = statusParam;
           const statusItem = document.querySelector(`.dropdown-item[data-value="${statusParam}"]`);
-          if (statusItem) {
+          if (statusItem && statusSelected) {
             const label = statusItem.querySelector('span:first-child').textContent.trim();
             statusSelected.textContent = label;
           }
@@ -482,8 +489,8 @@ const groupedStatuses = Object.values(statusCategories).map(category => {
       
       const tagParam = url.searchParams.get('tag');
       if (tagParam) {
-        filters.tag = tagParam;
-        tagSelected.textContent = tagParam;
+        filters.tag = tagParam.toLowerCase();
+        if (tagSelected) tagSelected.textContent = tagParam;
       }
       
       const searchParam = url.searchParams.get('search');
