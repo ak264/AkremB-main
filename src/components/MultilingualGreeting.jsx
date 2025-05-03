@@ -83,7 +83,7 @@ const MultilingualGreeting = () => {
   const isRTL = languageIndex === 1;
   
   return (
-    <div className="py-4">
+    <div className="py-4 h-28 overflow-hidden sm:h-auto">
       <div className="relative inline-block">
         <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-slide-right z-0"></div>
         <h1 className="relative z-10 text-4xl font-bold text-black dark:text-white flex items-center">
