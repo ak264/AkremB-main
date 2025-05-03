@@ -37,7 +37,7 @@ const truncatedTags = tags.map((tag: string) => {
 
 ---
 
-<div class="project-card rounded-lg overflow-hidden bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all h-full flex flex-col" data-status="{status}" data-tags="{tags.join(',')}" data-project-id="{project.id}">
+<div class="project-card rounded-lg overflow-hidden bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all h-full flex flex-col" data-status={status} data-tags={tags.join(',')} data-project-id={project.id}>
   <div class="p-6 flex flex-col h-full">
     <!-- Top section: Tags + Status with consistent height -->
     <div class="card-header flex justify-between items-start mb-4 min-h-[32px]">
