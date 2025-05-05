@@ -3,8 +3,6 @@ title: 'Community Hub App'
 description: 'TBA'
 pubDate: '2025-04-04T12:00:00Z'
 tags: ["Community", "Web Development"]
-demoLink: 
-githubLink:
 relatedPosts:
 status: 'actively-building'
 ---
