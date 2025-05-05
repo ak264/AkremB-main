@@ -7,7 +7,6 @@ demoLink:
 githubLink:
 relatedPosts:
 status: 'actively-building'
-coverImage: cover-image.jpg
 ---
 
 Inspiration: After the barrage of "Vibe-coding Hype" posts, I was inspired to build an app. That went well until you hit the "80% wall." Once it's built enough, it will continually break two things to fix one. Rather than restarting, I stopped and decided to do something easier before retooling and starting from scratch on the initial project.

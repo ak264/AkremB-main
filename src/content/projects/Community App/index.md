@@ -7,6 +7,5 @@ demoLink:
 githubLink:
 relatedPosts:
 status: 'actively-building'
-coverImage: cover-image.jpg
 ---
 To be written...
